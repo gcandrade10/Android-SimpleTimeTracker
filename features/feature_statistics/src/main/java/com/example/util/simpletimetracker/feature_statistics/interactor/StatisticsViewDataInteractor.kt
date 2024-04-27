@@ -79,6 +79,9 @@ class StatisticsViewDataInteractor @Inject constructor(
             filteredIds = filteredIds,
             range = range,
         )
+        val baseRecords = statisticsMediator.getBaseRecords(
+            range = range
+        )
         val chart = statisticsChartViewDataInteractor.getChart(
             filterType = filterType,
             filteredIds = filteredIds,
@@ -152,6 +155,18 @@ class StatisticsViewDataInteractor @Inject constructor(
             else -> recordInteractor.isEmpty() && runningRecordInteractor.isEmpty()
         }
 
+        val lastTime: ViewHolderType = statisticsMediator.getStatisticsLastTime(
+            baseRecords = baseRecords
+        ).let(statisticsViewDataMapper::mapStatisticsLastTimeTracked)
+        val showFirstEnterHintLT = when {
+            // Show hint ony on current date.
+            shift != 0 -> false
+            // Check all records only if there is no records for this day.
+            list.isNotEmpty() -> false
+            // Try to find if any record exists.
+            else -> recordInteractor.isEmpty() && runningRecordInteractor.isEmpty()
+        }
+
         // Assemble data.
         val result: MutableList<ViewHolderType> = mutableListOf()
 
@@ -164,6 +179,7 @@ class StatisticsViewDataInteractor @Inject constructor(
             chart.let(result::add)
             list.let(result::addAll)
             totalTracked.let(result::add)
+            lastTime.let(result::add)
             // If has any activity or tag other than untracked
             if (list.any { it.id != UNTRACKED_ITEM_ID } && !forSharing) {
                 statisticsViewDataMapper.mapToHint().let(result::add)

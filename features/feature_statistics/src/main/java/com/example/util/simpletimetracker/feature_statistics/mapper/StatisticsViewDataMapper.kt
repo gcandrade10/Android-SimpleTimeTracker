@@ -72,6 +72,13 @@ class StatisticsViewDataMapper @Inject constructor(
         )
     }
 
+    fun mapStatisticsLastTimeTracked(lastTime: String): ViewHolderType {
+        return StatisticsInfoViewData(
+            name = resourceRepo.getString(R.string.statistics_last),
+            text = lastTime,
+        )
+    }
+
     fun mapToEmpty(): ViewHolderType {
         return EmptyViewData(
             message = R.string.no_data.let(resourceRepo::getString),

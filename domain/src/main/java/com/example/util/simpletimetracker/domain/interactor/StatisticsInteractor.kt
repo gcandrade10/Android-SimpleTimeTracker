@@ -35,6 +35,12 @@ class StatisticsInteractor @Inject constructor(
             )
     }
 
+    suspend fun getBaseFromRange(
+        range: Range,
+    ): List<RecordBase> = withContext(Dispatchers.IO) {
+        getRecords(range)
+    }
+
     suspend fun getRecords(range: Range): List<RecordBase> {
         val runningRecords = runningRecordInteractor.getAll()
 

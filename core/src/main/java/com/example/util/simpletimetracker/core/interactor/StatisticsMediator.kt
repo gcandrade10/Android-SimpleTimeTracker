@@ -13,6 +13,7 @@ import com.example.util.simpletimetracker.domain.interactor.StatisticsInteractor
 import com.example.util.simpletimetracker.domain.interactor.StatisticsTagInteractor
 import com.example.util.simpletimetracker.domain.model.ChartFilterType
 import com.example.util.simpletimetracker.domain.model.Range
+import com.example.util.simpletimetracker.domain.model.RecordBase
 import com.example.util.simpletimetracker.domain.model.RecordType
 import com.example.util.simpletimetracker.domain.model.Statistics
 import javax.inject.Inject
@@ -40,6 +41,14 @@ class StatisticsMediator @Inject constructor(
             range = range,
             addUntracked = !filteredIds.contains(UNTRACKED_ITEM_ID) && showUntracked,
             addUncategorized = !filteredIds.contains(UNCATEGORIZED_ITEM_ID),
+        )
+    }
+
+    suspend fun getBaseRecords(
+        range: Range,
+    ): List<RecordBase> {
+        return getRecordsFromRange(
+            range = range
         )
     }
 
@@ -98,6 +107,13 @@ class StatisticsMediator @Inject constructor(
         )
     }
 
+    fun getStatisticsLastTime(
+        baseRecords: List<RecordBase>,
+    ): String {
+        val sorted = baseRecords.sortedByDescending { it.timeStarted }
+        return timeMapper.formatDate(sorted.first().timeStarted, false, false)
+    }
+
     private suspend fun getFromRange(
         filterType: ChartFilterType,
         range: Range,
@@ -128,5 +144,13 @@ class StatisticsMediator @Inject constructor(
                 )
             }
         }
+    }
+
+    private suspend fun getRecordsFromRange(
+        range: Range,
+    ): List<RecordBase> {
+        return statisticsInteractor.getBaseFromRange(
+            range = range,
+        )
     }
 }
